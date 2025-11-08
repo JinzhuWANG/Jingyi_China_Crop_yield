@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import xarray as xr
 import rioxarray as rxr
@@ -40,6 +41,8 @@ def calc_mean_std(in_xr):
     return xr.concat([mean_xr, std_xr], dim='band')
 
 # Get historical yield
+#  set the standard deviation for historical yield is 0
+#  this make it compatible with future yield data structure
 GAEZ_4_hist = (
     GAEZ_df.query('gaez_cat == "GAEZ_4" and name.str.contains("ycHa|ycHg") and rcp == "Historical"')
     .reset_index(drop=True)[[*GAEZ_4_vars, 'fpath']]
@@ -49,6 +52,11 @@ GAEZ_4_hist = (
 )
 
 GAEZ_4_hist_xr = get_xr_darray_from_df(GAEZ_4_hist)
+GAEZ_4_hist_xr = xr.concat(
+    [GAEZ_4_hist_xr.expand_dims(band=['mean']),
+     (GAEZ_4_hist_xr * 0).expand_dims(band=['std'])],
+    dim='band'
+)
 
 
 # Get future yield
@@ -74,6 +82,18 @@ GAEZ_4_future_xr = xr.concat(
     dim='crop'
 )
 
+
+# Convert (kg dry-weight)/ha to (t yield)/ha
+#   Conversion factor from Michalis
+convesion_factor = xr.DataArray(
+    np.array([0.87 * 1e-3, 0.875 * 1e-3, 0.875 * 1e-3], dtype=np.float32), 
+    dims=['crop'], 
+    coords={'crop': ['Maize', 'Wetland rice', 'Wheat']}
+)
+
+GAEZ_4_hist_xr = GAEZ_4_hist_xr * convesion_factor
+GAEZ_4_future_xr = GAEZ_4_future_xr * convesion_factor
+
 # Save to netcdf
-GAEZ_4_hist_xr.to_netcdf('data/GAEZ_v4/GAEZ_4_historical_yield.nc')
-GAEZ_4_future_xr.to_netcdf('data/GAEZ_v4/GAEZ_4_future_yield.nc')
+GAEZ_4_hist_xr.to_netcdf('data/GAEZ_v4/GAEZ_4_historical_t_ha.nc')
+GAEZ_4_future_xr.to_netcdf('data/GAEZ_v4/GAEZ_4_future_t_ha.nc')

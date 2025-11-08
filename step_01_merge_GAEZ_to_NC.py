@@ -25,7 +25,7 @@ def get_xr_darray_from_df(in_df):
     for idx,row in in_df.iterrows():
         dim_coord = {k:[v] for k,v in zip(in_df.index.names, idx)}
         arrs.append(
-            rxr.open_rasterio(row['fpath'])
+            rxr.open_rasterio(row['fpath'] + '_clipped.tif', masked=True)
             .drop_vars('band')
             .squeeze()
             .expand_dims(dim_coord)
@@ -69,6 +69,11 @@ GAEZ_4_future_wheat_xr = calc_mean_std(get_xr_darray_from_df(GAEZ_4_future_wheat
 GAEZ_4_future_maize_xr = calc_mean_std(get_xr_darray_from_df(GAEZ_4_future_maize))
 GAEZ_4_future_rice_xr = calc_mean_std(get_xr_darray_from_df(GAEZ_4_future_rice))
 
+GAEZ_4_future_xr = xr.concat(
+    [GAEZ_4_future_wheat_xr, GAEZ_4_future_maize_xr, GAEZ_4_future_rice_xr],
+    dim='crop'
+)
 
-GAEZ_4_future_rice_xr[0,0,0,0,0,0, ...]
-
+# Save to netcdf
+GAEZ_4_hist_xr.to_netcdf('data/GAEZ_v4/GAEZ_4_historical_yield.nc')
+GAEZ_4_future_xr.to_netcdf('data/GAEZ_v4/GAEZ_4_future_yield.nc')

@@ -1,18 +1,15 @@
 import numpy as np
-import rioxarray as rxr
 import xarray as xr
-import pandas as pd
 import itertools
 
 # Read GAEZ_4 yield data
 #  Only need the mean band for getting multipliers
-GAEZ_4_hist_t_ha = xr.open_dataarray('data/GAEZ_v4/GAEZ_4_historical_t_ha.nc').sel(band='mean', drop=True)
-GAEZ_4_future_t_ha = xr.open_dataarray('data/GAEZ_v4/GAEZ_4_future_t_ha.nc').sel(band='mean', drop=True)
+GAEZ_4_hist_t_ha = xr.open_dataarray('data/GAEZ_v4/GAEZ_4_historical_t_ha.nc').compute()
+GAEZ_4_future_t_ha = xr.open_dataarray('data/GAEZ_v4/GAEZ_4_future_t_ha.nc').compute()
 
 GAEZ_4_t_ha = xr.concat([GAEZ_4_hist_t_ha, GAEZ_4_future_t_ha], dim='year')
 
 # Get GAEZ_4 for 2020
-#  add 1e-10 to avoid zero std
 GAEZ_4_yr_2020_t_ha = GAEZ_4_t_ha.interp(year=[2020], method='linear')
 GAEZ_4_yr_2020_t_ha = GAEZ_4_yr_2020_t_ha.drop_vars('year').squeeze().astype(np.float32)
 

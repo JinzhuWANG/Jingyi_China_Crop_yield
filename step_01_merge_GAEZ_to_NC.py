@@ -7,9 +7,8 @@ import rioxarray as rxr
 # Read GAEZ dataframe, which contains mapping of path to tif files
 #   by default, input_level = High
 GAEZ_df = pd.read_csv('data/GAEZ_v4/GAEZ_df.csv').query('input_level == "High"')
-
 GAEZ_4_vars = ["year", "model", "rcp", "crop", "water_supply", "c02_fertilization"]
-GAEZ_5_vars = ["year", "crop", "water_supply", 'variable']
+
 
 year_rename = {
     '1981-2010':1995,

@@ -8,44 +8,11 @@ import statsmodels.api as sm
 
 from rasterio.features import rasterize
 
+from tools.constants import Province_names_cn_en
+
 PRED_BASE_YR = 2020
 PRED_TARGET_YR = 2100
 PRED_STEP = 5
-
-
-Province_names_cn_en = {
-    '北京市':'Beijing',
-    '天津市':'Tianjin',
-    '河北省':'Hebei',
-    '山西省':'Shanxi',
-    '内蒙古':'Inner Mongolia',
-    '辽宁省':'Liaoning',
-    '吉林省':'Jilin',
-    '黑龙江省':'Heilongjiang',
-    '上海市':'Shanghai',
-    '江苏省':'Jiangsu',
-    '浙江省':'Zhejiang',
-    '安徽省':'Anhui',
-    '福建省':'Fujian',
-    '江西省':'Jiangxi',
-    '山东省':'Shandong',
-    '河南省':'Henan',
-    '湖北省':'Hubei',
-    '湖南省':'Hunan',
-    '广东省':'Guangdong',
-    '广西':'Guangxi',
-    '海南省':'Hainan',
-    '重庆市':'Chongqing',
-    '四川省':'Sichuan',
-    '贵州省':'Guizhou',
-    '云南省':'Yunnan',
-    '西藏':'Tibet',
-    '陕西省':'Shaanxi',
-    '甘肃省':'Gansu',
-    '青海省':'Qinghai',
-    '宁夏':'Ningxia',
-    '新疆':'Xinjiang',
-}
 
 
 # helper functions
@@ -101,6 +68,7 @@ yearbook_yield = pd.concat([
 ).query('year >= 1990').reset_index(drop=True)
 
 yearbook_yield['Yield (tonnes)'] = yearbook_yield['Value'] / 1000
+yearbook_yield.to_csv('data/Yearbook/yearbook_crop_yield_hist.csv', index=False)
 
 
 # Function to fit a linear model to the data

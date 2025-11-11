@@ -9,8 +9,15 @@ years = range(2020, 2101, 5)
 
 # Load yield predictions
 yield_preds_xr = xr.open_dataarray('data/crop_yield_2020_2100_by_5yr.nc')
+
+# Load exploitable yield data
+'''
+Exploitable yield is defined as 80% of attainable yield. Source:https://www.yieldgap.org/web/guest/glossary
+'''
 GAEZ_4_future_t_ha = xr.open_dataarray('data/GAEZ_v4/GAEZ_4_future_t_ha.nc')\
-    .interp(year=years, kwargs={'fill_value': 'extrapolate'}).astype(np.float32)
+    .interp(year=years, kwargs={'fill_value': 'extrapolate'}).astype(np.float32)\
+    * 0.8 
+    
 
 
 # Concat pred with attainable
